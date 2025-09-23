@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faces of Freedom</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <main class="container">
+    <h1>Faces of Freedom</h1>
+    <div class="controls">
+      <label for="mode">Show distribution by:</label>
+      <select id="mode">
+        <option value="gender" selected>Gender of the sitter</option>
+        <option value="size">Size</option>
+      </select>
+    </div>
+    <div id="chart"></div>
+    <p class="footnote" id="note"></p>
+  </main>
+  <script src="splitbars.js"></script>
+</body>
+</html>
