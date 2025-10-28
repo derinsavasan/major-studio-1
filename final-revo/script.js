@@ -6,6 +6,115 @@ console.log("=== Starting Simple Version ===");
 
 let W, H, cols, rows, cellWidth, cellHeight, svg;
 
+// Utility function to create a styled button
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Promise-based animation sequence utility
+function sequenceAnimations(animations) {
+  return animations.reduce((promise, animation) => {
+    return promise.then(() => animation());
+  }, Promise.resolve());
+}
+
+// Utility function for wrapping text to fit within maxWidth
+function wrapText(text, maxWidth, charWidth) {
+  const words = text.split(" ");
+  const lines = [];
+  let currentLine = "";
+  
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const estimatedWidth = testLine.length * charWidth;
+    
+    if (estimatedWidth <= maxWidth && currentLine) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
+function createButton(group, text, x, y, width, height, onClick) {
+  const buttonGroup = group.append("g")
+    .attr("class", "button")
+    .attr("transform", `translate(${x}, ${y})`)
+    .style("cursor", "pointer")
+    .style("opacity", 0);
+
+  buttonGroup.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("fill", "#f0f0f0")
+    .attr("stroke", "#ccc")
+    .attr("stroke-width", 1)
+    .attr("rx", 18);
+
+  buttonGroup.append("text")
+    .attr("x", width / 2)
+    .attr("y", 23)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#2a2a2a")
+    .attr("font-family", "system-ui, -apple-system, sans-serif")
+    .attr("font-size", "15px")
+    .attr("font-weight", "500")
+    .text(text);
+
+  // Hover effects
+  buttonGroup
+    .on("mouseenter", function() {
+      d3.select(this).select("rect")
+        .transition()
+        .duration(200)
+        .attr("fill", "rgba(255, 255, 255, 1)");
+    })
+    .on("mouseleave", function() {
+      d3.select(this).select("rect")
+        .transition()
+        .duration(200)
+        .attr("fill", "rgba(255, 255, 255, 0.9)");
+    })
+    .on("click", onClick);
+
+  return buttonGroup;
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Promise-based animation sequence utility
+function sequenceAnimations(animations) {
+  return animations.reduce((promise, animation) => {
+    return promise.then(() => animation());
+  }, Promise.resolve());
+}
+
+// Utility function for wrapping text to fit within maxWidth
+function wrapText(text, maxWidth, charWidth) {
+  const words = text.split(" ");
+  const lines = [];
+  let currentLine = "";
+  
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const estimatedWidth = testLine.length * charWidth;
+    
+    if (estimatedWidth <= maxWidth && currentLine) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
 function calculateDimensions() {
   W = window.innerWidth;
   H = window.innerHeight;
@@ -218,61 +327,37 @@ function createExploreOverlay() {
     "Click below to start exploring."
   ];
   
-  textLines.forEach((line, i) => {
-    exploreBox.append("text")
-      .attr("x", boxWidth / 2)
-      .attr("y", 85 + (i * 21))
-      .attr("text-anchor", "middle")
-      .attr("fill", "#555")
-      .attr("font-family", "system-ui, -apple-system, sans-serif")
-      .attr("font-size", "15px")
-      .attr("font-weight", "400")
-      .attr("line-height", "1.4")
-      .text(line);
-  });
-  
-  // Larger, more prominent button
-  const buttonGroup = exploreBox.append("g")
-    .attr("class", "explore-button")
-    .attr("transform", `translate(${boxWidth/2 - 70}, 155)`)
-    .style("cursor", "pointer");
-  
-  buttonGroup.append("rect")
-    .attr("width", 140)
-    .attr("height", 36)
-    .attr("fill", "rgba(42, 42, 42, 0.9)")
-    .attr("stroke", "none")
-    .attr("rx", 18);
-  
-  buttonGroup.append("text")
-    .attr("x", 70)
-    .attr("y", 23)
+  exploreBox.selectAll(".explore-text")
+    .data(textLines)
+    .enter()
+    .append("text")
+    .attr("class", "explore-text")
+    .attr("x", boxWidth / 2)
+    .attr("y", (d, i) => 85 + (i * 21))
     .attr("text-anchor", "middle")
-    .attr("fill", "white")
+    .attr("fill", "#555")
     .attr("font-family", "system-ui, -apple-system, sans-serif")
     .attr("font-size", "15px")
-    .attr("font-weight", "500")
-    .text("Explore");
+    .attr("font-weight", "400")
+    .attr("line-height", "1.4")
+    .text(d => d);
   
-  // Subtle hover effect
-  buttonGroup
-    .on("mouseenter", function() {
-      d3.select(this).select("rect")
-        .transition()
-        .duration(200)
-        .attr("fill", "rgba(42, 42, 42, 1)");
-    })
-    .on("mouseleave", function() {
-      d3.select(this).select("rect")
-        .transition()
-        .duration(200)
-        .attr("fill", "rgba(42, 42, 42, 0.9)");
-    });
-  
-  // Click handler
-  overlay.on("click", function() {
+  // Larger, more prominent button
+  const buttonGroup = createButton(exploreBox, "Explore", boxWidth/2 - 70, 155, 140, 36, function() {
     startExploreExperience();
   });
+  
+  // Style the Explore button with dark background and white text
+  buttonGroup.select("rect")
+    .attr("fill", "#2a2a2a")
+    .attr("stroke", "none");
+  buttonGroup.select("text")
+    .attr("fill", "white");
+  
+  // Remove hover effect for the dark Explore button
+  buttonGroup
+    .on("mouseenter", null)
+    .on("mouseleave", null);
   
   // Smooth fade-in animation to match the elegance of portrait loading
   overlay
@@ -280,10 +365,16 @@ function createExploreOverlay() {
     .duration(1200) // Smooth 1.2 second fade-in
     .ease(d3.easeQuadOut)
     .style("opacity", 1);
+  
+  // Fade in button with overlay
+  buttonGroup
+    .transition()
+    .duration(1200)
+    .ease(d3.easeQuadOut)
+    .style("opacity", 1);
 }
 
-function startExploreExperience() {
-  console.log("Starting explore experience...");
+async function startExploreExperience() {
   
   // Stop all ongoing flip animations and intervals
   svg.selectAll("*").interrupt(); // Stop any ongoing D3 transitions
@@ -315,9 +406,9 @@ function startExploreExperience() {
   
   console.log("Flipping", shuffledImages.length, "images to black in random order");
   
-  // Flip images to black one by one in random order
-  shuffledImages.forEach((imageNode, i) => {
-    const timeoutId = setTimeout(() => {
+  // Flip images to black one by one in random order using promises
+  const flipPromises = shuffledImages.map((imageNode, i) => {
+    return delay(i * 80).then(() => {
       // Check if we're still in explore mode (not transitioned yet)
       if (!window.transitionedToTimeline) {
         const image = d3.select(imageNode);
@@ -356,25 +447,16 @@ function startExploreExperience() {
             }
           });
       }
-    }, i * 80); // 80ms delay between each random flip
-    
-    // Store timeout ID so we can clear it if needed
-    window.exploreTimeouts.push(timeoutId);
+    });
   });
   
-  // Start timeline transition after flip animation completes
-  const totalFlipDuration = shuffledImages.length * 80 + 800; // Total flip time + moderate pause
-  const transitionTimeoutId = setTimeout(() => {
-    transitionToTimeline();
-  }, totalFlipDuration);
-  
-  window.exploreTimeouts.push(transitionTimeoutId);
-  
-  console.log("Random flip sequence started");
+  // Wait for all flips to complete, then transition to timeline
+  await Promise.all(flipPromises);
+  await delay(800); // Moderate pause after flips
+  transitionToTimeline();
 }
 
 function transitionToTimeline() {
-  console.log("Transitioning to timeline view...");
   
   // Mark that we've transitioned to prevent further flip animations
   window.transitionedToTimeline = true;
@@ -402,7 +484,10 @@ function transitionToTimeline() {
   const timelineHeight = H - margin.top - margin.bottom;
   
   // Make timeline dimensions globally accessible for categorical transition
-  window.timelineConfig = { margin, timelineWidth, timelineHeight };
+  const lineSpacing = Math.max(18, Math.min(21, timelineWidth / 40));
+  const maxTextWidth = timelineWidth * 0.8;
+  const charWidth = Math.min(16, timelineWidth / 50) * 0.6;
+  window.timelineConfig = { margin, timelineWidth, timelineHeight, lineSpacing, maxTextWidth, charWidth };
   
   // Create timeline container
   const timelineGroup = svg.append("g")
@@ -509,39 +594,17 @@ function transitionToTimeline() {
       "Together, these points chart fluctuations in portrait production of a young nation trying to find its face."
     ].join(" ");
 
-    // Function to wrap text dynamically based on available width
-    const wrapText = (text, maxWidth) => {
-      const words = text.split(" ");
-      const lines = [];
-      let currentLine = "";
-      
-      words.forEach(word => {
-        const testLine = currentLine ? `${currentLine} ${word}` : word;
-        // Rough estimate: 0.6 * fontSize * character count
-        const estimatedWidth = testLine.length * Math.min(16, timelineWidth / 50) * 0.6;
-        
-        if (estimatedWidth <= maxWidth && currentLine) {
-          currentLine = testLine;
-        } else {
-          if (currentLine) lines.push(currentLine);
-          currentLine = word;
-        }
-      });
-      if (currentLine) lines.push(currentLine);
-      return lines;
-    };
-
     // Wrap text to fit within reasonable width (80% of timeline width)
-    const maxTextWidth = timelineWidth * 0.8;
-    const wrappedLines = wrapText(explanationText, maxTextWidth);
+    const maxTextWidth = window.timelineConfig.maxTextWidth;
+    const wrappedLines = wrapText(explanationText, maxTextWidth, window.timelineConfig.charWidth);
 
     const explanationTexts = wrappedLines.map((line, i) => {
       return timelineGroup.append("text")
         .attr("class", "timeline-explanation")
         .attr("x", timelineWidth / 2)
-        .attr("y", -margin.top * 0.25 + (i * Math.max(18, Math.min(21, timelineWidth / 40)))) // Position at 25% up into the top margin (more centered)
+        .attr("y", -margin.top * 0.25 + (i * window.timelineConfig.lineSpacing)) // Position at 25% up into the top margin (more centered)
         .attr("text-anchor", "middle")
-        .attr("fill", "#888")
+        .attr("fill", "white")
         .attr("font-family", "system-ui, -apple-system, sans-serif")
         .attr("font-size", Math.max(12, Math.min(16, timelineWidth / 35)) + "px") // Better responsive range
         .attr("font-weight", "300")
@@ -658,13 +721,194 @@ function transitionToTimeline() {
     console.error("Error loading timeline data:", error);
   });
   
-  // Add the See Breakdown button after timeline loads
+  // Add the highlight-1795 step after timeline loads
   setTimeout(() => {
-    console.log("Timeline transition complete");
     setTimeout(() => {
-      createSeeBreakdownButton();
+      highlightKeyDate1795Step();
     }, 1200); // Quicker delay for better responsiveness
   }, 3000); // Wait for timeline animation to complete
+// Highlight 1795 and its dots, dim others, and add 'Explore Key Dates' button
+function highlightKeyDate1795Step() {
+  const timelineGroup = svg.select(".timeline-view");
+  if (timelineGroup.empty()) return;
+
+  // Find all dots and x-axis labels
+  const dots = timelineGroup.selectAll(".portrait-dot");
+  const xAxisTicks = timelineGroup.selectAll(".x-axis .tick text");
+
+
+  // On initial load, do NOT highlight 1795. All dots and labels are normal.
+
+  // Add the 'Explore Key Dates' button below the explanation
+  // Find the last explanation text to position the button
+  const explanationNodes = timelineGroup.selectAll(".timeline-explanation").nodes();
+  let lastY = 0;
+  if (explanationNodes.length > 0) {
+    const last = d3.select(explanationNodes[explanationNodes.length - 1]);
+    lastY = +last.attr("y") || 0;
+  }
+  // Resize button to fit 'Spike of 1795' naturally
+  const buttonPadding = 36; // 18px left/right padding
+  const buttonText = "Spike of 1795";
+  const approxCharWidth = 9.5; // px, for system-ui 15px font
+  const buttonWidth = Math.round(buttonText.length * approxCharWidth + buttonPadding);
+  const buttonHeight = 36;
+  const timelineWidth = window.timelineConfig.timelineWidth;
+  const buttonX = (timelineWidth - buttonWidth) / 2;
+  const buttonY = lastY + 32;
+
+  // Remove any existing key dates button first
+  timelineGroup.select(".keydates-button").remove();
+
+  const buttonGroup = createButton(timelineGroup, buttonText, buttonX, buttonY, buttonWidth, buttonHeight, function() {
+    // Hide the timeline title and all explanatory texts (including 1795 explanation)
+    timelineGroup.selectAll(".timeline-title, .timeline-explanation").transition().duration(400).style("opacity", 0).on("end", function() { d3.select(this).remove(); });
+
+      // On click, animate 1795 dots/label to orange, others dimmed
+      dots.each(function(d) {
+        const is1795 = d.year === 1795;
+        d3.select(this)
+          .transition()
+          .duration(700)
+          .ease(d3.easeQuadOut)
+          .attr("fill", is1795 ? "#b8956a" : "#ffffff")
+          .attr("stroke", is1795 ? "#b8956a" : "#ccc")
+          .style("opacity", is1795 ? 1 : 0.18);
+      });
+      xAxisTicks.each(function() {
+        const text = d3.select(this).text();
+        if (text === "1795") {
+          d3.select(this)
+            .transition()
+            .duration(700)
+            .ease(d3.easeQuadOut)
+            .attr("fill", "#b8956a");
+        } else {
+          d3.select(this)
+            .transition()
+            .duration(700)
+            .ease(d3.easeQuadOut)
+            .attr("fill", "#ffffff");
+        }
+      });
+
+      // After highlight, update hover behavior so 1795 dots do not change color or border
+      dots.on("mouseenter", function(event, d) {
+        const is1795 = d.year === 1795;
+        if (is1795) {
+          // Do nothing: keep fill and stroke as muted orange
+          return;
+        }
+        d3.select(this)
+          .transition()
+          .duration(150)
+          .attr("r", 4 * 1.4)
+          .attr("fill", "#f0f0f0");
+
+        // Show tooltip
+        const timelineGroup = svg.select(".timeline-view");
+        const xScale = d3.scaleLinear()
+          .domain(d3.extent(window.categoricalData ? window.categoricalData.map(dd => dd.data.year) : [1770,1872]))
+          .range([0, window.timelineConfig.timelineWidth]);
+        const getYPosition = (stackIndex) => {
+          const timelineHeight = window.timelineConfig.timelineHeight;
+          const xAxisOffset = Math.max(20, window.innerHeight * 0.025);
+          const fixedDotSpacing = window.fixedDotSpacing || 15;
+          return (timelineHeight + 10) - xAxisOffset - ((stackIndex - 1) * fixedDotSpacing);
+        };
+        const tooltip = timelineGroup.append("g")
+          .attr("class", "tooltip")
+          .attr("transform", `translate(${xScale(d.year)}, ${getYPosition(d.stackIndex + 1) - 15})`);
+        tooltip.append("rect")
+          .attr("x", -75)
+          .attr("y", -30)
+          .attr("width", 150)
+          .attr("height", 25)
+          .attr("fill", "rgba(0, 0, 0, 0.9)")
+          .attr("rx", 4);
+        tooltip.append("text")
+          .attr("text-anchor", "middle")
+          .attr("y", -12)
+          .attr("fill", "white")
+          .attr("font-family", "system-ui, -apple-system, sans-serif")
+          .attr("font-size", "13px")
+          .text(`${d.year} • ${d.sitter || d.title}`);
+      })
+      .on("mouseleave", function(event, d) {
+        const is1795 = d.year === 1795;
+        if (is1795) {
+          // Do nothing: keep fill and stroke as muted orange
+          return;
+        }
+        d3.select(this)
+          .transition()
+          .duration(150)
+          .attr("r", 4)
+          .attr("fill", "white");
+        svg.select(".timeline-view").select(".tooltip").remove();
+      });
+
+      // Add the 1795 explanatory text in the same style as other explanatory texts
+      // Remove any previous 1795 explanation if present
+      timelineGroup.selectAll(".explanation-1795").remove();
+
+
+      // Position the Stuart (1795) explanatory text in the same place as the initial explanatory text
+      const margin = window.timelineConfig.margin;
+      const timelineWidth = window.timelineConfig.timelineWidth;
+      const lineSpacing = window.timelineConfig.lineSpacing;
+      const startY = -margin.top * 0.25; // Same as initial explanation
+
+      const explanation1795 = "1795 was the year America sat for its portrait. Painter Gilbert Stuart shows up in Philadelphia and suddenly every Revolutionary hero wants their face on a canvas. His George Washington portrait becomes the reference image, getting practically Xeroxed across the new republic.";
+
+      // Wrap text to fit within reasonable width (80% of timeline width)
+      const maxTextWidth = window.timelineConfig.maxTextWidth;
+      const wrappedLines = wrapText(explanation1795, maxTextWidth, window.timelineConfig.charWidth);
+
+      timelineGroup.selectAll(".explanation-1795")
+        .data(wrappedLines)
+        .enter()
+        .append("text")
+        .attr("class", "timeline-explanation explanation-1795")
+        .attr("x", timelineWidth / 2)
+        .attr("y", (d, i) => startY + (i * lineSpacing))
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-family", "system-ui, -apple-system, sans-serif")
+        .attr("font-size", Math.max(12, Math.min(16, timelineWidth / 35)) + "px")
+        .attr("font-weight", "300")
+        .style("opacity", 0)
+        .text(d => d)
+        .transition()
+        .delay((d, i) => 400 + (i * 200))
+        .duration(800)
+        .ease(d3.easeQuadOut)
+        .style("opacity", 0.9);
+
+      // Fade out button after highlight and after text appears, then show breakdown
+      // Add more lag after text fade-in before showing See Breakdown button
+      const extraLag = 400; // additional lag in ms
+      d3.select(this)
+        .transition()
+        .duration(500)
+        .style("opacity", 0)
+        .on("end", () => {
+          d3.select(this).remove();
+          setTimeout(() => {
+            createSeeBreakdownButton();
+          }, 800); // 400ms original + 400ms extra lag
+        });
+    });
+
+  buttonGroup.attr("class", "button keydates-button");
+
+  // Fade in button
+  buttonGroup
+    .transition()
+    .duration(1200)
+    .ease(d3.easeQuadOut)
+    .style("opacity", 1);
+}
 }
 
 // Add overlay after portraits load (skip in dev mode)
@@ -703,7 +947,7 @@ function createSeeBreakdownButton() {
   // Position based on where the explanatory text ends (positioned dynamically)
   const margin = window.timelineConfig.margin;
   const explanationStartY = -margin.top * 0.25; // Matches the dynamic position
-  const lineSpacing = Math.max(18, Math.min(21, window.timelineConfig.timelineWidth / 40));
+  const lineSpacing = window.timelineConfig.lineSpacing;
   
   // Count lines in the explanatory text to determine where it ends
   const explanationText = [
@@ -711,76 +955,21 @@ function createSeeBreakdownButton() {
     "Together, these points chart fluctuations in portrait production of a young nation trying to find its face."
   ].join(" ");
   
-  const maxTextWidth = window.timelineConfig.timelineWidth * 0.8;
-  const words = explanationText.split(" ");
-  let lines = [];
-  let currentLine = "";
-  
-  words.forEach(word => {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const estimatedWidth = testLine.length * Math.min(16, window.timelineConfig.timelineWidth / 50) * 0.6;
-    
-    if (estimatedWidth <= maxTextWidth && currentLine) {
-      currentLine = testLine;
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    }
-  });
-  if (currentLine) lines.push(currentLine);
+  const maxTextWidth = window.timelineConfig.maxTextWidth;
+  const lines = wrapText(explanationText, maxTextWidth, window.timelineConfig.charWidth);
   
   // Position button with spacing below text (closer to text)
   const textEndY = explanationStartY + (lines.length * lineSpacing);
-  const spacing = 12; // Reduced spacing to bring button closer to text
+  const spacing = 6; // Further reduced spacing to bring button even closer to text
   const buttonY = textEndY + spacing;
   
   // Remove any existing breakdown button first
   timelineGroup.select(".breakdown-button").remove();
   
-  const buttonGroup = timelineGroup.append("g")
-    .attr("class", "breakdown-button")
-    .attr("transform", `translate(${buttonX}, ${buttonY})`)
-    .style("cursor", "pointer")
-    .style("opacity", 0); // Start invisible
-  
-  console.log("Creating See Breakdown button at:", buttonX, buttonY, "after", lines.length, "lines, spacing:", spacing); // Debug log
-  
-  // Button background - inverted colors for better visibility
-  buttonGroup.append("rect")
-    .attr("width", buttonWidth)
-    .attr("height", buttonHeight)
-    .attr("fill", "rgba(255, 255, 255, 0.9)")
-    .attr("stroke", "none")
-    .attr("rx", 18);
-  
-  // Button text - inverted colors (dark text on light background)
-  buttonGroup.append("text")
-    .attr("x", buttonWidth / 2)
-    .attr("y", 23)
-    .attr("text-anchor", "middle")
-    .attr("fill", "#2a2a2a")
-    .attr("font-family", "system-ui, -apple-system, sans-serif")
-    .attr("font-size", "15px")
-    .attr("font-weight", "500")
-    .text("See Breakdown");
-  
-  // Hover effects - brighten on hover
-  buttonGroup
-    .on("mouseenter", function() {
-      d3.select(this).select("rect")
-        .transition()
-        .duration(200)
-        .attr("fill", "rgba(255, 255, 255, 1)");
-    })
-    .on("mouseleave", function() {
-      d3.select(this).select("rect")
-        .transition()
-        .duration(200)
-        .attr("fill", "rgba(255, 255, 255, 0.9)");
-    })
-    .on("click", function() {
-      startSeeBreakdownExperience();
-    });
+  const buttonGroup = createButton(timelineGroup, "See Breakdown", buttonX, buttonY, buttonWidth, buttonHeight, function() {
+    startSeeBreakdownExperience();
+  })
+    .attr("class", "breakdown-button");
   
   // Smooth fade-in animation - same timing as Explore button
   buttonGroup
@@ -791,8 +980,7 @@ function createSeeBreakdownButton() {
 }
 
 // Start the breakdown visualization experience
-function startSeeBreakdownExperience() {
-  console.log("Starting See Breakdown experience...");
+async function startSeeBreakdownExperience() {
   
   const timelineGroup = svg.select(".timeline-view");
   
@@ -804,7 +992,19 @@ function startSeeBreakdownExperience() {
     .on("end", () => {
       timelineGroup.select(".breakdown-button").remove();
     });
-  
+
+  // Reset all dots and x-axis labels to normal (white fill, white label, normal opacity and stroke)
+  timelineGroup.selectAll(".portrait-dot")
+    .transition()
+    .duration(500)
+    .attr("fill", "#ffffff")
+    .attr("stroke", "#ccc")
+    .style("opacity", 1);
+  timelineGroup.selectAll(".x-axis .tick text")
+    .transition()
+    .duration(500)
+    .attr("fill", "#ffffff");
+
   // Fade out and remove the title
   timelineGroup.select(".timeline-title")
     .transition()
@@ -813,7 +1013,7 @@ function startSeeBreakdownExperience() {
     .on("end", function() {
       d3.select(this).remove();
     });
-  
+
   // Fade out and remove the explanatory text
   timelineGroup.selectAll(".timeline-explanation")
     .transition()
@@ -822,16 +1022,14 @@ function startSeeBreakdownExperience() {
     .on("end", function() {
       d3.select(this).remove();
     });
-  
-  // Start the categorical transition
-  setTimeout(() => {
-    transitionToCategoricalBreakdown();
-  }, 300);
+
+  // Start the categorical transition after a delay
+  await delay(300);
+  transitionToCategoricalBreakdown();
 }
 
 // Transition to categorical breakdown visualization  
-function transitionToCategoricalBreakdown() {
-  console.log("Starting categorical breakdown transition...");
+async function transitionToCategoricalBreakdown() {
   
   const timelineGroup = svg.select(".timeline-view");
   if (timelineGroup.empty()) {
@@ -858,9 +1056,8 @@ function transitionToCategoricalBreakdown() {
     .attr("transform", `translate(${margin.left}, ${margin.top - moveUpDistance})`);
   
   // 2. Create dropdown menu positioned where See Breakdown button was
-  setTimeout(() => {
-    createCategoryDropdown(timelineGroup, timelineWidth, timelineHeight, moveUpDistance);
-  }, transitionDuration / 2);
+  await delay(transitionDuration / 2);
+  createCategoryDropdown(timelineGroup, timelineWidth, timelineHeight, moveUpDistance);
   
   // 3. Store current data for categorical grouping
   const dots = timelineGroup.selectAll(".portrait-dot");
@@ -895,12 +1092,12 @@ function createCategoryDropdown(timelineGroup, timelineWidth, timelineHeight, mo
   
   // Position elements
   const textStartY = categoryViewHeight * 0.05; // Explanatory text at top
-  const lineSpacing = Math.max(18, Math.min(21, timelineWidth / 40));
+  const lineSpacing = window.timelineConfig.lineSpacing;
   
   // Helper function to calculate dropdown Y position based on text lines
   const calculateDropdownY = (numLines = 1) => {
     const textHeight = textStartY + (numLines * lineSpacing);
-    const spacing = 8; // Reduced spacing for closer positioning
+    const spacing = 4; // Further reduced spacing for closer positioning
     return textHeight + spacing;
   };
   
@@ -923,31 +1120,30 @@ function createCategoryDropdown(timelineGroup, timelineWidth, timelineHeight, mo
       key: "size", 
       label: "Size", 
       getValue: (d) => d.size || "Unknown",
-      explanation: "In early America, size was status. Miniatures lived in pockets and lockets, meant to be held, not seen. Full-size portraits hung in parlors and state rooms, built for public memory. Scale decided who stayed private and who entered history."
+      explanation: "In early America, size was status. Miniatures lived in pockets and lockets, meant to be held, not seen. Full-size portraits hung in parlors and state rooms, built for public memory."
     },
     { 
       key: "artist", 
       label: "Artist", 
       getValue: (d) => d.artist && d.artist.trim() ? "Known" : "Unknown",
-      explanation: "Artist explanatory text here." // TODO: Add text
+      explanation: "As Jay-Z put it, “I'm not a businessman, I'm a business, man.” The known artists stamped themselves into history, preserving their face and signature. The unknown ones didn't get as lucky."
     },
     { 
       key: "sitter", 
       label: "Sitter", 
       getValue: (d) => d.sitter && d.sitter.trim() ? "Named" : "Unnamed",
-      explanation: "Sitter explanatory text here." // TODO: Add text
+      explanation: "Some names were recorded because they mattered. When the sitter is unnamed, it says just as much: someone paid for the portrait, but not enough value was placed on the person's name to preserve it."
     },
     { 
       key: "gender", 
       label: "Sitter's Gender", 
       getValue: (d) => {
         const gender = (d.gender || "").toLowerCase().trim();
-        console.log("Gender value:", d.gender, "-> processed:", gender); // Debug
         if (gender === "male") return "Male";
         if (gender === "female") return "Female";
         return null; // Filter out unknown genders
       },
-      explanation: "Gender explanatory text here." // TODO: Add text
+      explanation: "The ratio skews male. That tells you less about population and more about who portrait culture considered worth recording. Unless you were the wife of a man who mattered, of course."
     }
   ];
   
@@ -1081,7 +1277,7 @@ function createCategoryDropdown(timelineGroup, timelineWidth, timelineHeight, mo
     .attr("x", timelineWidth / 2)
     .attr("y", textStartY)
     .attr("text-anchor", "middle")
-    .attr("fill", "#888")
+    .attr("fill", "white")
     .attr("font-family", "system-ui, -apple-system, sans-serif")
     .attr("font-size", Math.max(12, Math.min(16, timelineWidth / 35)) + "px")
     .attr("font-weight", "300")
@@ -1106,7 +1302,6 @@ function createCategoryDropdown(timelineGroup, timelineWidth, timelineHeight, mo
 
 // Handle category selection and update visualization
 function selectCategory(category, dropdownText, optionsGroup) {
-  console.log("Selected category:", category.label);
   
   // Update dropdown text to show selected category with down arrow (closed state)
   dropdownText.text(category.label + " ↓");
@@ -1191,30 +1386,10 @@ function animateToCategories(category) {
   
   // Add category-specific explanatory text if available
   if (category.explanation) {
-    const wrapText = (text, maxWidth) => {
-      const words = text.split(" ");
-      const lines = [];
-      let currentLine = "";
-      
-      words.forEach(word => {
-        const testLine = currentLine ? `${currentLine} ${word}` : word;
-        const estimatedWidth = testLine.length * Math.min(16, timelineWidth / 50) * 0.6;
-        
-        if (estimatedWidth <= maxWidth && currentLine) {
-          currentLine = testLine;
-        } else {
-          if (currentLine) lines.push(currentLine);
-          currentLine = word;
-        }
-      });
-      if (currentLine) lines.push(currentLine);
-      return lines;
-    };
-
     const maxTextWidth = timelineWidth * 0.7;
-    const wrappedLines = wrapText(category.explanation, maxTextWidth);
+    const wrappedLines = wrapText(category.explanation, maxTextWidth, window.timelineConfig.charWidth);
     const textStartY = categoryViewHeight * 0.05; // Position at top (5% down)
-    const lineSpacing = Math.max(18, Math.min(21, timelineWidth / 40));
+    const lineSpacing = window.timelineConfig.lineSpacing;
 
     const categoryExplanationTexts = wrappedLines.map((line, i) => {
       return timelineGroup.append("text")
@@ -1222,7 +1397,7 @@ function animateToCategories(category) {
         .attr("x", timelineWidth / 2)
         .attr("y", textStartY + (i * lineSpacing))
         .attr("text-anchor", "middle")
-        .attr("fill", "#888")
+  .attr("fill", "#b8956a")
         .attr("font-family", "system-ui, -apple-system, sans-serif")
         .attr("font-size", Math.max(12, Math.min(16, timelineWidth / 35)) + "px")
         .attr("font-weight", "300")
@@ -1361,9 +1536,9 @@ function animateToCategories(category) {
       .attr("x", labelX)
       .attr("y", newXAxisY + labelOffset) // Offset from x-axis for spacing
       .attr("text-anchor", isAboveAxis ? "end" : "start") // Text extends in direction of data
-      .attr("fill", "#888")
+  .attr("fill", "#b8956a")
       .attr("font-family", "system-ui, -apple-system, sans-serif")
-      .attr("font-size", "13px")
+      .attr("font-size", Math.max(12, Math.min(16, timelineWidth / 35)) + "px")
       .attr("font-weight", "400")
       .attr("transform", `rotate(-90, ${labelX}, ${newXAxisY + labelOffset})`)
       .style("opacity", 0)
