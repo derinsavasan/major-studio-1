@@ -19,3 +19,10 @@ Face Value looks at portraits from the American Revolution and asks a basic ques
 - `script.js` — D3.js visualization and interaction logic
 - `data/portraits_v1.csv` — Portrait dataset scraped from the Smithsonian National Portrait 
 
+## Screenshots
+<img width="1470" height="844" alt="Screenshot 2025-10-30 at 2 18 57 PM" src="https://github.com/user-attachments/assets/f5afe057-1c5d-4e8c-a2dd-a8e668e98618" />
+<img width="1470" height="844" alt="Screenshot 2025-10-30 at 2 18 40 PM" src="https://github.com/user-attachments/assets/002caa86-39c3-4b95-bfa6-7117292e99b3" />
+<img width="1470" height="844" alt="Screenshot 2025-10-30 at 2 18 16 PM" src="https://github.com/user-attachments/assets/e1e4450c-6df4-496a-82a4-ebca75518b2d" />
+<img width="1470" height="844" alt="Screenshot 2025-10-30 at 2 18 06 PM" src="https://github.com/user-attachments/assets/32bb5d61-dd6a-468d-80d6-d6564cb0a928" />
+<img width="1470" height="844" alt="Screenshot 2025-10-30 at 2 17 54 PM" src="https://github.com/user-attachments/assets/2936c1e4-b0b1-4474-a1f3-ea8baf4e359d" />
+<img width="1470" height="844" alt="Screenshot 2025-10-30 at 2 17 27 PM" src="https://github.com/user-attachments/assets/3bcc901c-cbdb-403b-9e60-5d1816064cbb" />
