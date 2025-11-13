@@ -12,7 +12,7 @@ const hints = [
 ];
 
 // Load data and initialize game
-d3.csv("portraits_v1.csv").then(loadedData => {
+d3.csv("data/portraits_v1.csv").then(loadedData => {
   data = loadedData;
   renderGrid();
   // Show initial hint
