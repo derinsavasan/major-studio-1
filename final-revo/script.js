@@ -775,6 +775,51 @@ function highlightKeyDate1795Step() {
           .attr("stroke", is1795 ? "#b8956a" : "#ccc")
           .style("opacity", is1795 ? 1 : 0.18);
       });
+
+      // Add Washington portrait during spike sequence
+      const portraitSize = 120;
+      const portraitX = window.timelineConfig.timelineWidth - portraitSize - 20;
+      const portraitY = 20;
+      
+      const washingtonPortrait = timelineGroup.append("g")
+        .attr("class", "washington-portrait")
+        .attr("transform", `translate(${portraitX}, ${portraitY})`)
+        .style("opacity", 0);
+
+      // Add circular clipping path for the portrait
+      const defs = svg.select("defs").empty() ? svg.append("defs") : svg.select("defs");
+      defs.append("clipPath")
+        .attr("id", "washington-clip")
+        .append("circle")
+        .attr("cx", portraitSize / 2)
+        .attr("cy", portraitSize / 2)
+        .attr("r", portraitSize / 2);
+
+      // Add portrait background circle
+      washingtonPortrait.append("circle")
+        .attr("cx", portraitSize / 2)
+        .attr("cy", portraitSize / 2)
+        .attr("r", portraitSize / 2)
+        .attr("fill", "#b8956a")
+        .attr("stroke", "#b8956a")
+        .attr("stroke-width", 2);
+
+      // Add portrait image
+      washingtonPortrait.append("image")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", portraitSize)
+        .attr("height", portraitSize)
+        .attr("clip-path", "url(#washington-clip)")
+        .attr("href", "https://ids.si.edu/ids/deliveryService?id=NPG-NPG_2001_13_ext");
+
+      // Animate portrait in
+      washingtonPortrait
+        .transition()
+        .delay(200)
+        .duration(800)
+        .ease(d3.easeQuadOut)
+        .style("opacity", 1);
       xAxisTicks.each(function() {
         const text = d3.select(this).text();
         if (text === "1795") {
@@ -991,6 +1036,15 @@ async function startSeeBreakdownExperience() {
     .style("opacity", 0)
     .on("end", () => {
       timelineGroup.select(".breakdown-button").remove();
+    });
+
+  // Remove Washington portrait if it exists
+  timelineGroup.select(".washington-portrait")
+    .transition()
+    .duration(500)
+    .style("opacity", 0)
+    .on("end", function() {
+      d3.select(this).remove();
     });
 
   // Reset all dots and x-axis labels to normal (white fill, white label, normal opacity and stroke)
