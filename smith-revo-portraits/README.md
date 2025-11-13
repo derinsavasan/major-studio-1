@@ -1,2 +1,0 @@
-Since not all the images have the same dimensions, the bars won't perfectly align left with the same indent.
-I considered standardising all the thumbnails to squares, but that affects the visibility of the images themselves.
