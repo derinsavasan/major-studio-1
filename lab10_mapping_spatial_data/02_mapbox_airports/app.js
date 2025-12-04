@@ -1,7 +1,7 @@
 //   Register to get your Mapbox access token https://docs.mapbox.com/help/glossary/access-token/
 //   Code from https://docs.mapbox.com/help/tutorials/custom-markers-gl-js/ 
 
-mapboxgl.accessToken = 'pk.yourTokenHere'; // replace with your own access token
+mapboxgl.accessToken = 'pk.eyJ1IjoiZGVyaW5zYXZhc2FuIiwiYSI6ImNtaHhxcXRrMjA0aW4ybG9zZzM3cTlyYjcifQ.VnKQfPgNROZ1cMw6ADvZtA'; // replace with your own access token
 
 var map = new mapboxgl.Map({
   container: 'map',
