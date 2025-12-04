@@ -73,6 +73,7 @@ function displayMostSimilarPair(images) {
 async function main() {
   const images = await loadImages(imagePaths);
   if (images) {
+    compareImages(images);
     displayMostSimilarPair(images);
   }
 }

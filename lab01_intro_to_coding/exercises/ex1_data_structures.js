@@ -32,9 +32,10 @@ var years = [
 
 // Task 1
 // Console log the length of each Array
-console.log(names.length)
-console.log(URLs.length)
-console.log(years.length)
+console.log(/* COMPLETE ME */)
+console.log(/* COMPLETE ME */)
+console.log(/* COMPLETE ME */)
+
 
 
 // Task 2
@@ -43,9 +44,9 @@ var newName = "The International Center of Photography"
 var newURL = "icp.org"
 var newYear = 1974
 
-names.push(newName);                  // add to names
-URLs[URLs.length] = newURL;           // add to URLs at the end
-years = years.concat([newYear]);      // cocat returns a new array
+names.push(/* COMPLETE ME */);
+URLs[/* COMPLETE ME */] = newURL;
+years = years.concat(/* COMPLETE ME */);
 
 // Task 3
 // construct an Object out of our three Arrays
@@ -59,9 +60,9 @@ var result = {
 
 var museums = {};
 for (var i = 0; i < names.length; i++) {
-  var currentName = names[i];        // museum name
-  var currentURL = URLs[i];          // corresponging URL
-  var currentYear = years[i];        // corresponding year
+  var currentName = names[/* COMPLETE ME */];
+  /* COMPLETE ME */ = URLs[i];
+  var currentYear = /* COMPLETE ME */;
 
   museums[currentName] = {};
   museums[currentName]["URL"] = currentURL;
@@ -71,7 +72,7 @@ for (var i = 0; i < names.length; i++) {
 console.log('museums', museums)
 
 var museums2 = {};
-names.forEach(function(n, i) {      // n = name, i = index
+names.forEach(function(/* COMPLETE ME*/) {
   museums2[n] = {};
 
   var currentURL = URLs[i];
@@ -83,16 +84,14 @@ names.forEach(function(n, i) {      // n = name, i = index
 
 console.log('museums2', museums2)
 
-// Task 4
+// Task
 // Write a function to add a new museum object, with properties URL and year, to an existing museums object. Call it on museums2
 function addAMuseum(museums, newName, newURL, newYear){
-  museums[newName] = {
-    URL: newURL,
-    year: newYear
-  };
+  /* COMPLETE ME */
+
   return museums;
 }
 
-addAMuseum(museums2, "Test Museum", "test.org", 2025);
+addAMuseum(/* COMPLETE ME */);
 
-console.log('museums2 after adding new museum', museums2);
+console.log('museums2', museums2);
